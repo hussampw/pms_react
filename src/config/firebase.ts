@@ -4,12 +4,12 @@ import { getFirestore, Firestore, enableIndexedDbPersistence, connectFirestoreEm
 import { Platform } from 'react-native';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAKa8GcedYGk_YCybcZm9CsKrmy73wYIGA",
-  authDomain: "property-management-com.firebaseapp.com",
-  projectId: "property-management-com",
-  storageBucket: "property-management-com.firebasestorage.app",
-  messagingSenderId: "586124033050",
-  appId: "1:586124033050:android:ffafe4d14ce2fc813ce5a3"
+  apiKey: process.env.FIREBASE_API_KEY,
+  authDomain: process.env.AUTH_DOMAIN,
+  projectId: process.env.PROJECT_ID,
+  storageBucket: process.env.STORAGE_BUCKET,
+  messagingSenderId: process.env.MESSAGING_SENDER_ID,
+  appId: process.env.APP_ID
 };
 
 // Initialize Firebase app only if it hasn't been initialized
