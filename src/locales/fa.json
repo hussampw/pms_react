@@ -1,0 +1,15 @@
+{
+    "welcome": "خوش آمدید",
+    "login": "ورود",
+    "register": "ثبت نام",
+    "email": "ایمیل",
+    "password": "رمز عبور",
+    "dashboard": "داشبورد",
+    "units": "واحدها",
+    "payments": "پرداخت‌ها",
+    "obligations": "تعهدات",
+    "tenants": "مستأجران",
+    "expenses": "هزینه‌ها",
+    "reports": "گزارشات",
+    "settings": "تنظیمات"
+  }
