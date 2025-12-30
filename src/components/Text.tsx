@@ -1,7 +1,6 @@
 // components/RNText.tsx
 import React from 'react';
 import { Text as RNText, StyleSheet, TextProps as RNTextProps, StyleProp, TextStyle } from 'react-native';
-import i18n from '../config/i18n';
 interface TextProps extends RNTextProps {
   bold?: boolean;  // Make optional with ?
   italic?: boolean;  // Make optional with ?
@@ -15,8 +14,6 @@ export const Text = ({
   italic,
   ...props
 }: TextProps) => {
-  const currentLanguage = i18n.language;
-  const isRTL = currentLanguage === 'ar' || currentLanguage === 'fa';
   const textStyles = [
     styles.default,
     bold && styles.bold,
@@ -26,7 +23,7 @@ export const Text = ({
 
   return (
     <RNText style={textStyles} {...props}>
-      {isRTL ? <Text style={textStyles}>{children}</Text> : children}
+     {children}
     </RNText>
   );
 };
@@ -44,5 +41,3 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
 });
-
-export default RNText;

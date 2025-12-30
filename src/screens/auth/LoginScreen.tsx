@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
-import { View, Text , Input , Button } from '../../components/index';
+import { View, Text , Input , Button } from '../../components';
 import { useAuthStore } from '../../stores/authStore';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';

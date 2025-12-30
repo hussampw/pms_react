@@ -6,9 +6,8 @@ import { useAuthStore } from '../../stores/authStore';
 import { usePaymentsStore } from '../../stores/paymentsStore';
 import { useUnitsStore } from '../../stores/unitsStore';
 import { useTenantsStore } from '../../stores/tenantsStore';
-import { Input } from '../../components/Input';
-import { Button } from '../../components/Button';
-
+import { Input ,Button} from '../../components';
+import { useTranslation } from 'react-i18next';
 // Type assertion for Picker component
 const TypedPicker = Picker as any;
 
@@ -18,7 +17,7 @@ export const AddPaymentScreen = ({ navigation }) => {
   const { units, fetchUnits } = useUnitsStore();
   const { tenants, fetchTenants } = useTenantsStore();
   const [loading, setLoading] = useState(false);
-  
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     unit_id: '',
     payment_amount: '',
@@ -43,7 +42,7 @@ export const AddPaymentScreen = ({ navigation }) => {
 
   const handleSubmit = async () => {
     if (!formData.unit_id || !formData.payment_amount) {
-      Alert.alert('خطأ', 'الرجاء إدخال البيانات المطلوبة');
+      Alert.alert(t('error'), t('please_enter_required_data'));
       return;
     }
 
@@ -55,10 +54,10 @@ export const AddPaymentScreen = ({ navigation }) => {
         tenant_id: formData.tenant_id || null,
       }, user?.uid || '');
       
-      Alert.alert('نجاح', 'تم إضافة المدفوع بنجاح');
+      Alert.alert(t('success'), t('payment_added_successfully'));
       navigation.goBack();
     } catch (error) {
-      Alert.alert('خطأ', 'فشل في إضافة المدفوع');
+      Alert.alert(t('error'), t('payment_add_failed'));
     } finally {
       setLoading(false);
     }
@@ -75,7 +74,7 @@ export const AddPaymentScreen = ({ navigation }) => {
           selectedValue={formData.unit_id}
           onValueChange={(value) => updateField('unit_id', value)}
         >
-          <TypedPicker.Item label="اختر الوحدة" value="" />
+          <TypedPicker.Item label={t('select_unit')} value="" />
           {units.map(unit => (
             <TypedPicker.Item 
               key={unit.id} 
@@ -92,7 +91,7 @@ export const AddPaymentScreen = ({ navigation }) => {
             selectedValue={formData.tenant_id}
             onValueChange={(value) => updateField('tenant_id', value)}
           >
-            <TypedPicker.Item label="اختر المستأجر (اختياري)" value="" />
+            <TypedPicker.Item label={t('select_tenant_optional')} value="" />
             {filteredTenants.map(tenant => (
               <TypedPicker.Item 
                 key={tenant.id} 
@@ -105,7 +104,7 @@ export const AddPaymentScreen = ({ navigation }) => {
       )}
 
       <Input
-        label="المبلغ (ر.ع) *"
+        label={t('payment_amount') + " (ر.ع) *"}
         value={formData.payment_amount}
         onChangeText={(value) => updateField('payment_amount', value)}
         placeholder="0.00"
@@ -113,7 +112,7 @@ export const AddPaymentScreen = ({ navigation }) => {
       />
 
       <Input
-        label="التاريخ"
+        label={t('payment_date')}
         value={formData.payment_date}
         onChangeText={(value) => updateField('payment_date', value)}
         placeholder="YYYY-MM-DD"
@@ -124,8 +123,8 @@ export const AddPaymentScreen = ({ navigation }) => {
           selectedValue={formData.payment_direction}
           onValueChange={(value) => updateField('payment_direction', value)}
         >
-          <TypedPicker.Item label="وارد (دخل)" value="incoming" />
-          <TypedPicker.Item label="صادر (مصروف)" value="outgoing" />
+          <TypedPicker.Item label={t('incoming')} value="incoming" />
+          <TypedPicker.Item label={t('outgoing')} value="outgoing" />
         </TypedPicker>
       </View>
 
@@ -134,11 +133,11 @@ export const AddPaymentScreen = ({ navigation }) => {
           selectedValue={formData.payment_type}
           onValueChange={(value) => updateField('payment_type', value)}
         >
-          <TypedPicker.Item label="إيجار" value="rent" />
-          <TypedPicker.Item label="تأمين" value="deposit" />
-          <TypedPicker.Item label="صيانة" value="maintenance" />
-          <TypedPicker.Item label="فواتير" value="bills" />
-          <TypedPicker.Item label="أخرى" value="other" />
+          <TypedPicker.Item label={t('rent')} value="rent" />
+          <TypedPicker.Item label={t('deposit')} value="deposit" />
+          <TypedPicker.Item label={t('maintenance')} value="maintenance" />
+          <TypedPicker.Item label={t('bills')} value="bills" />
+          <TypedPicker.Item label={t('other')} value="other" />
         </TypedPicker>
       </View>
 
@@ -147,23 +146,23 @@ export const AddPaymentScreen = ({ navigation }) => {
           selectedValue={formData.payment_method}
           onValueChange={(value) => updateField('payment_method', value)}
         >
-          <TypedPicker.Item label="نقدي" value="cash" />
-          <TypedPicker.Item label="تحويل بنكي" value="bank" />
-          <TypedPicker.Item label="بطاقة" value="card" />
+          <TypedPicker.Item label={t('cash')} value="cash" />
+          <TypedPicker.Item label={t('bank_transfer')} value="bank" />
+          <TypedPicker.Item label={t('card')} value="card" />
         </TypedPicker>
       </View>
 
       <Input
-        label="ملاحظات"
+        label={t('notes')}
         value={formData.notes}
         onChangeText={(value) => updateField('notes', value)}
-        placeholder="ملاحظات إضافية"
+        placeholder={t('notes_placeholder')}
         multiline
         numberOfLines={3}
       />
 
       <Button
-        title="إضافة المدفوع"
+        title={t('add_payment')}
         onPress={handleSubmit}
         loading={loading}
       />

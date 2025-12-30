@@ -5,13 +5,15 @@ import { useUnitsStore } from '../../stores/unitsStore';
 import { useTenantsStore } from '../../stores/tenantsStore';
 import { Card } from '../../components/Card';
 import { Button } from '../../components/Button';
-
+import { useTranslation } from 'react-i18next';
 export const UnitDetailScreen = ({ route, navigation }) => {
   const { unit } = route.params;
   const { user } = useAuthStore();
   const { deleteUnit, getUnitsByParent } = useUnitsStore();
   const { tenants } = useTenantsStore();
   const [subUnits, setSubUnits] = useState([]);
+    const { t } = useTranslation();
+  
   
   const currentTenant = tenants.find(t => t.unit_id === unit.id && t.status === 'active');
 
@@ -26,12 +28,12 @@ export const UnitDetailScreen = ({ route, navigation }) => {
 
   const handleDelete = () => {
     Alert.alert(
-      'تأكيد الحذف',
-      'هل أنت متأكد من حذف هذه الوحدة؟',
+      t('confirm'),
+      t('are_you_sure_delete_unit'),
       [
-        { text: 'إلغاء', style: 'cancel' },
+        { text: t('cancel'), style: 'cancel' },
         {
-          text: 'حذف',
+          text: t('delete'),
           style: 'destructive',
           onPress: async () => {
             await deleteUnit(unit.id, user?.uid || '');
@@ -49,25 +51,25 @@ export const UnitDetailScreen = ({ route, navigation }) => {
         {unit.address && <Text style={styles.address}>{unit.address}</Text>}
         
         <View style={styles.infoRow}>
-          <Text style={styles.label}>النوع:</Text>
+          <Text style={styles.label}>{t('type')}:</Text>
           <Text style={styles.value}>{unit.unit_type}</Text>
         </View>
 
         <View style={styles.infoRow}>
-          <Text style={styles.label}>الحالة:</Text>
+          <Text style={styles.label}>{t('status')}:</Text>
           <Text style={styles.value}>{unit.status}</Text>
         </View>
 
         {unit.rent_amount && (
           <View style={styles.infoRow}>
-            <Text style={styles.label}>الإيجار:</Text>
+            <Text style={styles.label}>{t('rent')}:</Text>
             <Text style={styles.value}>{unit.rent_amount} ر.ع</Text>
           </View>
         )}
 
         {unit.description && (
           <View style={styles.descriptionBox}>
-            <Text style={styles.label}>الوصف:</Text>
+            <Text style={styles.label}>{t('description')}:</Text>
             <Text style={styles.description}>{unit.description}</Text>
           </View>
         )}
@@ -75,7 +77,7 @@ export const UnitDetailScreen = ({ route, navigation }) => {
 
       {currentTenant && (
         <Card>
-          <Text style={styles.sectionTitle}>المستأجر الحالي</Text>
+          <Text style={styles.sectionTitle}>{t('current_tenant')}</Text>
           <Text style={styles.tenantName}>{currentTenant.full_name}</Text>
           <Text style={styles.tenantPhone}>{currentTenant.phone}</Text>
         </Card>
@@ -83,7 +85,7 @@ export const UnitDetailScreen = ({ route, navigation }) => {
 
       {subUnits.length > 0 && (
         <Card>
-          <Text style={styles.sectionTitle}>الوحدات الفرعية ({subUnits.length})</Text>
+          <Text style={styles.sectionTitle}>{t('sub_units')} ({subUnits.length})</Text>
           {subUnits.map(sub => (
             <TouchableOpacity
               key={sub.id}
@@ -99,21 +101,21 @@ export const UnitDetailScreen = ({ route, navigation }) => {
 
       <View style={styles.actions}>
         <Button
-          title="إضافة وحدة فرعية"
+          title={t('add_sub_unit')}
           onPress={() => navigation.navigate('AddUnit', { parentUnitId: unit.id })}
           variant="primary"
           style={styles.actionButton}
         />
         
         <Button
-          title="إضافة مستأجر"
+          title={t('add_tenant')}
           onPress={() => navigation.navigate('AddTenant', { unitId: unit.id })}
           variant="success"
           style={styles.actionButton}
         />
         
         <Button
-          title="حذف الوحدة"
+          title={t('delete_unit')}
           onPress={handleDelete}
           variant="danger"
           style={styles.actionButton}

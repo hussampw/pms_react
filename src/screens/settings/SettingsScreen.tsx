@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { ScrollView, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 import { View } from '../../components/View';
 import { Text } from '../../components/Text';
@@ -6,7 +6,6 @@ import { Card } from '../../components/Card';
 import { Button } from '../../components/Button';
 import { useAuthStore } from '../../stores/authStore';
 import { useTranslation } from 'react-i18next';
-
 import { initDatabase } from '../../config/database';
 import { useLanguageStore } from '../../stores/languageStore';
 
@@ -15,14 +14,20 @@ const languages = [
   { code: 'ar', name: 'Arabic', nativeName: 'العربية' },
   { code: 'fa', name: 'Persian', nativeName: 'فارسی' },
 ];
+
 export const SettingsScreen = ({ navigation }) => {
   const { user, logout } = useAuthStore();
-  const { currentLanguage, changeLanguage } = useLanguageStore();
   const { t } = useTranslation();
-  const handleLogout = async () => {
+  
+  // Use individual selectors to prevent unnecessary re-renders
+  const currentLanguage = useLanguageStore(state => state.currentLanguage);
+  const isChanging = useLanguageStore(state => state.isChanging);
+  const changeLanguage = useLanguageStore(state => state.changeLanguage);
+
+  const handleLogout = useCallback(async () => {
     Alert.alert(
-    t('logout'),
-    t('logout_confirmation'),
+      t('logout'),
+      t('logout_confirmation'),
       [
         { text: t('cancel'), style: 'cancel' },
         {
@@ -35,16 +40,39 @@ export const SettingsScreen = ({ navigation }) => {
         }
       ]
     );
-  };
-  const handleLanguageChange = async (langCode: 'en' | 'ar' | 'fa') => {
-    await changeLanguage(langCode);
-  };
+  }, [t, logout, navigation]);
 
-  const getLanguageName = (code: string) => {
+  const handleLanguageChange = useCallback(async (langCode: 'en' | 'ar' | 'fa') => {
+    // Prevent multiple clicks
+    if (isChanging) {
+      return;
+    }
+    
+    try {
+      await changeLanguage(langCode);
+      
+      // Optional: Show success message
+      setTimeout(() => {
+        Alert.alert(
+          t('success'),
+          t('language_changed_successfully') || 'Language changed successfully'
+        );
+      }, 100);
+    } catch (error) {
+      console.error('Language change failed:', error);
+      Alert.alert(
+        t('error'),
+        t('failed_to_change_language') || 'Failed to change language'
+      );
+    }
+  }, [changeLanguage, isChanging, t]);
+
+  const getLanguageName = useCallback((code: string) => {
     const lang = languages.find(l => l.code === code);
     return lang ? lang.nativeName : code;
-  };
-  const handleResetDatabase = () => {
+  }, []);
+
+  const handleResetDatabase = useCallback(() => {
     Alert.alert(
       t('reset_database'),
       t('reset_database_confirmation'),
@@ -64,13 +92,14 @@ export const SettingsScreen = ({ navigation }) => {
         }
       ]
     );
-  };
+  }, [t]);
 
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>{t('settings')}</Text>
       </View>
+
       <Card style={styles.card}>
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t('language')}</Text>
@@ -78,31 +107,43 @@ export const SettingsScreen = ({ navigation }) => {
             {t('current_language')}: {getLanguageName(currentLanguage)}
           </Text>
           <View style={styles.languageButtons}>
-            {languages.map((lang) => (
-              <TouchableOpacity
-                key={lang.code}
-                style={[
-                  styles.languageButton,
-                  currentLanguage === lang.code && styles.languageButtonActive
-                ]}
-                onPress={() => handleLanguageChange(lang.code as 'en' | 'ar' | 'fa')}
-              >
-                <Text
+            {languages.map((lang) => {
+              const isActive = currentLanguage === lang.code;
+              const isDisabled = isChanging || isActive;
+              
+              return (
+                <TouchableOpacity
+                  key={lang.code}
                   style={[
-                    styles.languageButtonText,
-                    currentLanguage === lang.code && styles.languageButtonTextActive
+                    styles.languageButton,
+                    isActive && styles.languageButtonActive,
+                    isDisabled && styles.languageButtonDisabled
                   ]}
+                  onPress={() => handleLanguageChange(lang.code as 'en' | 'ar' | 'fa')}
+                  disabled={isDisabled}
+                  activeOpacity={0.7}
                 >
-                  {lang.nativeName}
-                </Text>
-                {currentLanguage === lang.code && (
-                  <Text style={styles.checkmark}>✓</Text>
-                )}
-              </TouchableOpacity>
-            ))}
+                  <Text
+                    style={[
+                      styles.languageButtonText,
+                      isActive && styles.languageButtonTextActive
+                    ]}
+                  >
+                    {lang.nativeName}
+                  </Text>
+                  {isActive && (
+                    <Text style={styles.checkmark}>✓</Text>
+                  )}
+                </TouchableOpacity>
+              );
+            })}
           </View>
+          {isChanging && (
+            <Text style={styles.changingText}>Changing language...</Text>
+          )}
         </View>
       </Card>
+
       <Card style={styles.card}>
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t('account_information')}</Text>
@@ -163,6 +204,24 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingTop: 40,
   },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  card: {
+    margin: 15,
+    marginTop: 0,
+  },
+  section: {
+    padding: 10,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 15,
+  },
   currentLanguageLabel: {
     fontSize: 14,
     color: '#666',
@@ -185,6 +244,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#e3f2fd',
     borderColor: '#2196F3',
   },
+  languageButtonDisabled: {
+    opacity: 0.6,
+  },
   languageButtonText: {
     fontSize: 16,
     color: '#333',
@@ -198,23 +260,12 @@ const styles = StyleSheet.create({
     color: '#2196F3',
     fontWeight: '600',
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  card: {
-    margin: 15,
-    marginTop: 0,
-  },
-  section: {
-    padding: 10,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 15,
+  changingText: {
+    fontSize: 12,
+    color: '#2196F3',
+    marginTop: 10,
+    textAlign: 'center',
+    fontStyle: 'italic',
   },
   infoRow: {
     flexDirection: 'row',
@@ -253,5 +304,3 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   }
 });
-
-

@@ -4,7 +4,7 @@ import { useAuthStore } from '../../stores/authStore';
 import { useUnitsStore } from '../../stores/unitsStore';
 import { Card } from '../../components/Card';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
+import { useTranslation } from 'react-i18next';
 const UnitTypeIcon = {
   building: '🏢',
   apartment: '🏠',
@@ -14,6 +14,7 @@ const UnitTypeIcon = {
 };
 
 const StatusBadge = ({ status }) => {
+  const { t } = useTranslation();
   const colors = {
     vacant: '#4CAF50',
     rented: '#2196F3',
@@ -21,9 +22,9 @@ const StatusBadge = ({ status }) => {
   };
   
   const labels = {
-    vacant: 'شاغر',
-    rented: 'مؤجر',
-    maintenance: 'صيانة',
+    vacant: t('unit_status_available'),
+    rented: t('unit_status_occupied'),
+    maintenance: t('unit_status_maintenance'),
   };
 
   return (
@@ -71,10 +72,11 @@ export const UnitsListScreen = ({ navigation }) => {
     
     return flatten(tree);
   }, [units]);
-
+const { t } = useTranslation();
   const renderUnit = ({ item }) => {
     const indent = item.level * 20;
     const hasChildren = units.some(u => u.parent_id === item.id);
+
     
     return (
       <Card 
@@ -95,7 +97,7 @@ export const UnitsListScreen = ({ navigation }) => {
                 )}
                 {item.parent_id && (
                   <Text style={styles.parentUnitText}>
-                    تحت: {units.find(u => u.id === item.parent_id)?.unit_name || 'غير معروف'}
+                    {t('under')}: {units.find(u => u.id === item.parent_id)?.unit_name || t('unknown')}
                   </Text>
                 )}
               </View>
@@ -106,15 +108,15 @@ export const UnitsListScreen = ({ navigation }) => {
         
         {item.rent_amount > 0 && (
           <View style={[styles.rentInfo, { paddingLeft: indent }]}>
-            <Text style={styles.rentLabel}>الإيجار:</Text>
-            <Text style={styles.rentAmount}>{item.rent_amount} ر.ع</Text>
+            <Text style={styles.rentLabel}>{t('rent')}:</Text>
+            <Text style={styles.rentAmount}>{item.rent_amount} {t('OMR')}</Text>
           </View>
         )}
         
         {hasChildren && (
           <View style={[styles.childrenIndicator, { paddingLeft: indent }]}>
             <Text style={styles.childrenText}>
-              {units.filter(u => u.parent_id === item.id).length} وحدة فرعية
+              {units.filter(u => u.parent_id === item.id).length} {t('sub_units')}
             </Text>
           </View>
         )}
@@ -131,8 +133,8 @@ export const UnitsListScreen = ({ navigation }) => {
         contentContainerStyle={styles.list}
         ListEmptyComponent={
           <View style={styles.empty}>
-            <Text style={styles.emptyText}>لا توجد وحدات</Text>
-            <Text style={styles.emptySubtext}>ابدأ بإضافة وحدتك الأولى</Text>
+            <Text style={styles.emptyText}>{t('no_units')}</Text>
+            <Text style={styles.emptySubtext}>{t('start_adding_first_unit')}</Text>
           </View>
         }
       />

@@ -4,6 +4,7 @@ export * from './Input';
 export * from './StatCard';
 export * from './View';
 export * from './Text';
+export * from './FlatList';
 // export * from './Image';
 // export * from './TouchableOpacity';
 // export * from './ScrollView';

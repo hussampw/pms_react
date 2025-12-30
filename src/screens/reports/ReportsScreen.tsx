@@ -7,7 +7,7 @@ import { StatCard } from '../../components/StatCard';
 import { useAuthStore } from '../../stores/authStore';
 import { usePaymentsStore } from '../../stores/paymentsStore';
 import { useExpensesStore } from '../../stores/expensesStore';
-
+import { useTranslation } from 'react-i18next';
 export const ReportsScreen = ({ navigation }) => {
   const { user } = useAuthStore();
   const { getPaymentStats } = usePaymentsStore();
@@ -15,7 +15,7 @@ export const ReportsScreen = ({ navigation }) => {
   const [paymentStats, setPaymentStats] = useState({ total_income: 0, total_expenses: 0 });
   const [expenseStats, setExpenseStats] = useState([]);
   const [loading, setLoading] = useState(true);
-
+  const { t } = useTranslation();
   useEffect(() => {
     loadStats();
   }, [user]);
@@ -51,18 +51,18 @@ export const ReportsScreen = ({ navigation }) => {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>التقارير المالية</Text>
-        <Text style={styles.subtitle}>نظرة عامة على الأداء المالي</Text>
+        <Text style={styles.title}>{t('financial_reports')}</Text>
+        <Text style={styles.subtitle}>{t('financial_overview')}</Text>
       </View>
 
       <View style={styles.statsRow}>
         <StatCard
-          title="إجمالي الدخل"
+          title={t('total_income')}
           value={`${paymentStats.total_income?.toFixed(0) || 0} ر.ع`}
           color="#4CAF50"
         />
         <StatCard
-          title="إجمالي المدفوعات"
+          title={t('total_payments')}
           value={`${paymentStats.total_expenses?.toFixed(0) || 0} ر.ع`}
           color="#F44336"
         />
@@ -70,12 +70,12 @@ export const ReportsScreen = ({ navigation }) => {
 
       <View style={styles.statsRow}>
         <StatCard
-          title="صافي الربح"
+          title={t('net_profit')}
           value={`${netProfit.toFixed(0)} ر.ع`}
           color={netProfit >= 0 ? '#4CAF50' : '#F44336'}
         />
         <StatCard
-          title="إجمالي المصروفات"
+          title={t('total_expenses')}
           value={`${totalExpenses.toFixed(0)} ر.ع`}
           color="#FF9800"
         />
@@ -83,11 +83,11 @@ export const ReportsScreen = ({ navigation }) => {
 
       {expenseStats.length > 0 && (
         <Card style={styles.categoryCard}>
-          <Text style={styles.cardTitle}>المصروفات حسب الفئة</Text>
+          <Text style={styles.cardTitle}> {t('expenses_by_category')}</Text>
           {expenseStats.map((stat, index) => (
             <View key={index} style={styles.categoryItem}>
               <Text style={styles.categoryName}>{stat.category_name}</Text>
-              <Text style={styles.categoryAmount}>{stat.total?.toFixed(0) || 0} ر.ع</Text>
+              <Text style={styles.categoryAmount}>{stat.total?.toFixed(0) || 0} {t('OMR')}</Text>
             </View>
           ))}
         </Card>

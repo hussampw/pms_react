@@ -1,14 +1,14 @@
 import React, { useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import {  StyleSheet, TouchableOpacity } from 'react-native';
+import { View , Text,FlatList } from '../../components';
 import { useAuthStore } from '../../stores/authStore';
 import { usePaymentsStore } from '../../stores/paymentsStore';
 import { Card } from '../../components/Card';
 import { format } from 'date-fns';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
+import { useTranslation } from 'react-i18next';
 const PaymentItem = ({ payment }) => {
   const isIncoming = payment.payment_direction === 'incoming';
-  
   return (
     <Card>
       <View style={styles.paymentHeader}>
@@ -39,6 +39,7 @@ const PaymentItem = ({ payment }) => {
 };
 
 export const PaymentsScreen = ({ navigation }) => {
+  const { t } = useTranslation();
   const { user } = useAuthStore();
   const { payments, fetchPayments } = usePaymentsStore();
 
@@ -57,7 +58,7 @@ export const PaymentsScreen = ({ navigation }) => {
         contentContainerStyle={styles.list}
         ListEmptyComponent={
           <View style={styles.empty}>
-            <Text style={styles.emptyText}>لا توجد مدفوعات</Text>
+            <Text style={styles.emptyText}>{t('no_payments')}</Text>
           </View>
         }
       />

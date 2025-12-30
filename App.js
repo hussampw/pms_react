@@ -1,14 +1,21 @@
 import React, { useEffect, useState } from 'react';
-import { Platform, View, Text, StyleSheet } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { AppNavigator } from './src/navigation/AppNavigator';
 import { initDatabase } from './src/config/database';
+import { View, Text } from './src/components';
 import { notificationService } from './src/services/notificationService';
 import './src/config/i18n';
+import {I18nManager } from 'react-native';
+import { currentLanguage } from './src/stores/languageStore';
 export default function App() {
   const [appReady, setAppReady] = useState(false);
   const [error, setError] = useState(null);
-
+if (currentLanguage === 'ar' || currentLanguage === 'fa') {
+  I18nManager.forceRTL(true);
+} else {
+  I18nManager.forceRTL(false);
+}
   useEffect(() => {
     const init = async () => {
       try {

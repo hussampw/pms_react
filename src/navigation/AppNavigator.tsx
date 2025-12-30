@@ -178,6 +178,7 @@ export const AppNavigator = () => {
   useEffect(() => {
     
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      console.log('Auth state changed. User:', firebaseUser ? firebaseUser.email : 'null');
       
       if (firebaseUser) {
         // User is already authenticated, just set the user in store
